@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Interaktive 3D-Visualisierung des Seeds-Datensatzes mit t-SNE."
+    >
+
+    <title>
+        Drei Weizeninseln – Seeds-Daten in 3D
+    </title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <a class="sprunglink" href="#hauptinhalt">
+        Zum Hauptinhalt
+    </a>
+
+    <!-- START AUFGABE 10: Kopfbereich -->
+
+    <header class="seitenkopf">
+
+        <div class="kopfbereich">
+
+            <div class="kopftext">
+
+                <p class="aufgabenbezeichnung">
+                    Einsendeaufgabe 10
+                </p>
+
+                <h1>Drei Weizeninseln</h1>
+
+                <p class="einleitung">
+                    Eine Forschungsreise durch den Datenraum:
+                    210 Weizenkörner werden mithilfe von t-SNE
+                    von sieben Merkmalen auf drei Dimensionen
+                    reduziert.
+                </p>
+
+            </div>
+
+            <!--
+                Falls dein Bild in einem anderen Ordner liegt,
+                muss nur der Wert bei src angepasst werden.
+            -->
+            <img
+                class="profilbild"
+                src="bilder/ich2.png"
+                alt="Comicfigur von Cassandra als kleine Datenforscherin"
+                width="174"
+                height="340"
+            >
+
+        </div>
+
+    </header>
+
+    <!-- END AUFGABE 10: Kopfbereich -->
+
+
+    <main id="hauptinhalt">
+
+        <!-- START AUFGABE 10: 3D-Visualisierung -->
+
+        <section
+            class="darstellungsbereich"
+            aria-labelledby="visualisierung-titel"
+        >
+
+            <p class="aufgabenbezeichnung">
+                Seeds-Daten und t-SNE
+            </p>
+
+            <h2 id="visualisierung-titel">
+                Expedition zu den drei Weizeninseln
+            </h2>
+
+            <p class="abschnittseinleitung">
+                Unser kleines Pinguin-Forschungsteam erkundet 210 Weizenproben
+                im dreidimensionalen Datenraum. Jeder Punkt steht für eine
+                Probe. Die Farben zeigen, ob sie zur Sorte Kama, Rosa oder
+                Canadian gehört.
+            </p>
+
+
+            <div class="visualisierungsrahmen">
+
+                <canvas
+                    id="glcanvas"
+                    width="900"
+                    height="620"
+                    aria-label="Dreidimensionale Darstellung des Seeds-Datensatzes"
+                >
+                    Ihr Browser unterstützt das Canvas-Element nicht.
+                </canvas>
+
+                <img
+                    class="pinguin-forscher"
+                    src="bilder/bildpinguin.png"
+                    alt="Zwei Pinguine erforschen gemeinsam den Datenraum"
+                >
+
+                <aside class="postit" aria-label="Hinweis zur Darstellung">
+
+                    <h3>Drei Sorten – sieben Merkmale</h3>
+
+                    <p>
+                        <span class="postitpunkt kama"></span>
+                        Kama
+                    </p>
+
+                    <p>
+                        <span class="postitpunkt rosa"></span>
+                        Rosa
+                    </p>
+
+                    <p>
+                        <span class="postitpunkt canadian"></span>
+                        Canadian
+                    </p>
+
+                    <strong>
+                        Welche Inseln entstehen?
+                    </strong>
+
+                </aside>
+
+            </div>
+
+
+            <p
+                id="statusmeldung"
+                class="statusmeldung"
+                role="status"
+                aria-live="polite"
+            >
+                Die gespeicherte beste Darstellung wird geladen.
+            </p>
+
+
+            <div class="legende" aria-label="Farblegende">
+
+                <div class="legendenpunkt">
+
+                    <span class="farbkreis kama"></span>
+
+                    <div>
+                        <strong>Kama</strong>
+                        <span>Klasse 1</span>
+                    </div>
+
+                </div>
+
+                <div class="legendenpunkt">
+
+                    <span class="farbkreis rosa"></span>
+
+                    <div>
+                        <strong>Rosa</strong>
+                        <span>Klasse 2</span>
+                    </div>
+
+                </div>
+
+                <div class="legendenpunkt">
+
+                    <span class="farbkreis canadian"></span>
+
+                    <div>
+                        <strong>Canadian</strong>
+                        <span>Klasse 3</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="steuerungsraster">
+
+                <!-- Steuerung der t-SNE-Berechnung -->
+
+                <article class="steuerungskarte">
+
+                    <h3>t-SNE berechnen</h3>
+
+                    <p>
+                        Nach einem Neustart beginnt t-SNE mit einer
+                        neuen zufälligen Ausgangsverteilung.
+                    </p>
+
+                    <div class="buttonzeile">
+
+                        <button id="restart-button" type="button">
+                            Restart
+                        </button>
+
+                        <button id="step-button" type="button">
+                            Step
+                        </button>
+
+                        <button id="step10-button" type="button">
+                            Step 10
+                        </button>
+
+                    </div>
+
+                    <p class="wertanzeige">
+                        Schritt:
+                        <strong id="step-count">Gespeichertes Ergebnis</strong>
+                    </p>
+
+                </article>
+
+
+                <!-- Navigation im dreidimensionalen Raum -->
+
+                <article class="steuerungskarte">
+
+                    <h3>Datenraum ansehen</h3>
+
+                    <p>
+                        Drehe die Darstellung oder verändere den
+                        Abstand zur Szene.
+                    </p>
+
+                    <div class="richtungstasten">
+
+                        <button
+                            id="oben-button"
+                            type="button"
+                            aria-label="Ansicht nach oben drehen"
+                        >
+                            ↑
+                        </button>
+
+                        <div>
+                            <button
+                                id="links-button"
+                                type="button"
+                                aria-label="Ansicht nach links drehen"
+                            >
+                                ←
+                            </button>
+
+                            <button
+                                id="unten-button"
+                                type="button"
+                                aria-label="Ansicht nach unten drehen"
+                            >
+                                ↓
+                            </button>
+
+                            <button
+                                id="rechts-button"
+                                type="button"
+                                aria-label="Ansicht nach rechts drehen"
+                            >
+                                →
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div class="buttonzeile">
+
+                        <button id="naeher-button" type="button">
+                            Näher
+                        </button>
+
+                        <button id="weiter-button" type="button">
+                            Weiter
+                        </button>
+
+                        <button id="ansicht-reset-button" type="button">
+                            Ansicht zurücksetzen
+                        </button>
+
+                    </div>
+
+                    <p id="kamera-status" class="wertanzeige">
+                        Kamera: Ausgangsposition
+                    </p>
+
+                </article>
+
+            </div>
+
+
+            <!-- Anzeige der verwendeten Parameter -->
+
+            <section
+                class="parameterbereich"
+                aria-labelledby="parameter-titel"
+            >
+
+                <h3 id="parameter-titel">
+                    Verwendete t-SNE-Einstellungen
+                </h3>
+
+                <dl class="parameterliste">
+
+                    <div>
+                        <dt>Ausgangsdimensionen</dt>
+                        <dd>7 Merkmale</dd>
+                    </div>
+
+                    <div>
+                        <dt>Zieldimensionen</dt>
+                        <dd>3 Dimensionen</dd>
+                    </div>
+
+                    <div>
+                        <dt>Perplexity</dt>
+                        <dd id="perplexity-anzeige">30</dd>
+                    </div>
+
+                    <div>
+                        <dt>Epsilon</dt>
+                        <dd id="epsilon-anzeige">10</dd>
+                    </div>
+
+                    <div>
+                        <dt>Gespeicherte Iterationen</dt>
+                        <dd id="iteration-anzeige">wird noch ermittelt</dd>
+                    </div>
+
+                    <div>
+                        <dt>Datensätze</dt>
+                        <dd id="datensatz-anzeige">210</dd>
+                    </div>
+
+                </dl>
+
+            </section>
+
+
+            <!-- Liste der Tastatursteuerung -->
+
+            <section
+                class="bedienungsbereich"
+                aria-labelledby="bedienung-titel"
+            >
+
+                <h3 id="bedienung-titel">Bedienung</h3>
+
+                <ul class="tastenliste">
+
+                    <li>
+                        <kbd>R</kbd>
+                        startet die t-SNE-Berechnung mit einer neuen
+                        zufälligen Ausgangsverteilung bei Schritt 0.
+                    </li>
+
+                    <li>
+                        <kbd>T</kbd>
+                        führt einen einzelnen Berechnungsschritt aus.
+                    </li>
+
+                    <li>
+                        <kbd>Shift</kbd> + <kbd>T</kbd>
+                        führt zehn Berechnungsschritte auf einmal aus.
+                    </li>
+
+                    <li>
+                        <kbd>←</kbd> und <kbd>→</kbd>
+                        drehen den Datenraum nach links oder rechts.
+                    </li>
+
+                    <li>
+                        <kbd>↑</kbd> und <kbd>↓</kbd>
+                        drehen den Datenraum nach oben oder unten.
+                    </li>
+
+                    <li>
+                        <kbd>N</kbd>
+                        bewegt die Kamera näher an die Daten.
+                    </li>
+
+                    <li>
+                        <kbd>Shift</kbd> + <kbd>N</kbd>
+                        vergrößert den Abstand der Kamera.
+                    </li>
+
+                </ul>
+
+                <p class="hinweis">
+                    Alle Funktionen können zusätzlich über die
+                    sichtbaren Schaltflächen bedient werden.
+                </p>
+
+            </section>
+
+        </section>
+
+        <!-- END AUFGABE 10: 3D-Visualisierung -->
+
+
+        <!-- START AUFGABE 10: Persönliche Gestaltung -->
+
+        <section
+            class="sortenbereich"
+            aria-labelledby="sorten-titel"
+        >
+
+            <p class="aufgabenbezeichnung">
+                Drei Sorten im Datenraum
+            </p>
+
+            <h2 id="sorten-titel">
+                Meine drei Weizeninseln
+            </h2>
+
+            <p class="abschnittseinleitung">
+                Die Farben helfen dabei, die Sorten auch während
+                der schrittweisen Berechnung auseinanderzuhalten.
+            </p>
+
+            <div class="sortenraster">
+
+                <article class="sortenkarte kama-karte">
+
+                    <span class="kornsymbol kama"></span>
+
+                    <h3>Kama</h3>
+
+                    <p>
+                        Die erste Sorte wird in Türkis dargestellt.
+                        Ihre 70 Proben bilden die erste Insel im
+                        dreidimensionalen Datenraum.
+                    </p>
+
+                </article>
+
+                <article class="sortenkarte rosa-karte">
+
+                    <span class="kornsymbol rosa"></span>
+
+                    <h3>Rosa</h3>
+
+                    <p>
+                        Die zweite Sorte erhält passend zu ihrem
+                        Namen einen Rosaton. Auch sie besteht aus
+                        70 einzelnen Proben.
+                    </p>
+
+                </article>
+
+                <article class="sortenkarte canadian-karte">
+
+                    <span class="kornsymbol canadian"></span>
+
+                    <h3>Canadian</h3>
+
+                    <p>
+                        Die dritte Sorte wird in Orange gezeigt.
+                        Gemeinsam ergeben die drei Klassen insgesamt
+                        210 Datenpunkte.
+                    </p>
+
+                </article>
+
+            </div>
+
+        </section>
+
+        <!-- END AUFGABE 10: Persönliche Gestaltung -->
+
+
+        <!-- START AUFGABE 10: Dokumentation -->
+
+        <section
+            class="dokumentation"
+            aria-labelledby="dokumentation-titel"
+        >
+
+            <p class="aufgabenbezeichnung">
+                Informationen zur Umsetzung
+            </p>
+
+            <h2 id="dokumentation-titel">
+                Dokumentation
+            </h2>
+
+            <p class="abschnittseinleitung">
+                Wie aus sieben Eigenschaften eine dreidimensionale
+                und interaktive Darstellung entsteht.
+            </p>
+
+
+            <div class="dokumentationsraster">
+
+                <article class="dokumentationskarte">
+
+                    <h3>Idee und Gestaltung</h3>
+
+                    <p>
+                        Für die letzte Einsendeaufgabe wollte ich
+                        das wiederkehrende Reisethema fortführen.
+                        Aus den drei Weizensorten werden drei
+                        Weizeninseln, die im Datenraum erkundet
+                        werden können.
+                    </p>
+
+                    <p>
+                        Die drei Farben unterscheiden die Klassen
+                        deutlich voneinander. Das Pinguinmotiv bleibt
+                        als kleiner Forschungsbegleiter erhalten,
+                        während die Daten selbst im Mittelpunkt stehen.
+                    </p>
+
+                </article>
+
+
+                <article class="dokumentationskarte">
+
+                    <h3>Aufbereitung der Daten</h3>
+
+                    <p>
+                        Der Seeds-Datensatz enthält 210 Proben.
+                        Jede Probe besitzt sieben numerische
+                        Eigenschaften und gehört zu einer von drei
+                        Weizensorten.
+                    </p>
+
+                    <p>
+                        Die CSV-Datei wird automatisch geladen und
+                        mit Papa Parse in ein JavaScript-Array
+                        umgewandelt. Die Klassenangabe wird dabei
+                        getrennt von den sieben Merkmalen gespeichert.
+                    </p>
+
+                </article>
+
+
+                <article class="dokumentationskarte">
+
+                    <h3>Dimensionsreduktion mit t-SNE</h3>
+
+                    <p>
+                        t-SNE reduziert die sieben Merkmale jeder
+                        Probe auf drei räumliche Koordinaten. Dabei
+                        versucht der Algorithmus, ähnliche Datensätze
+                        nah beieinander anzuordnen.
+                    </p>
+
+                    <p>
+                        Vor der Berechnung werden die Merkmale
+                        standardisiert. Dadurch erhält kein Merkmal
+                        nur wegen eines größeren Zahlenbereichs ein
+                        zu starkes Gewicht.
+                    </p>
+
+                </article>
+
+
+                <article class="dokumentationskarte">
+
+                    <h3>Gespeichertes Ergebnis</h3>
+
+                    <p>
+                        Für die Startansicht wurden mehrere t-SNE-Berechnungen
+                        mit standardisierten Seeds-Daten verglichen. Das am
+                        deutlichsten getrennte Ergebnis wurde anschließend als
+                        CSV-Datei gespeichert und wird beim Öffnen der Anwendung
+                        automatisch geladen.
+                    </p>
+
+                    <p>
+                        Die gespeicherte Startdarstellung wurde offline mit der
+                        t-SNE-Implementierung von scikit-learn berechnet. Für die
+                        direkt auf der Webseite gestarteten Neuberechnungen wird
+                        tSNEJS verwendet. Durch Restart beginnt diese interaktive
+                        Berechnung mit einer neuen zufälligen Verteilung bei
+                        Schritt 0.
+                    </p>
+
+                </article>
+
+
+                <article class="dokumentationskarte">
+
+                    <h3>Navigation und technische Umsetzung</h3>
+
+                    <p>
+                        Die Punkte werden mit WebGL im dreidimensionalen
+                        Raum dargestellt. Die Ansicht kann über die
+                        Pfeiltasten gedreht werden. Mit N und
+                        Shift-N wird der Kameraabstand verändert.
+                    </p>
+
+                    <p>
+                        Der aktuelle Berechnungsschritt wird auf der
+                        Webseite angezeigt. Die Bedienung funktioniert
+                        sowohl über die Tastatur als auch über die
+                        sichtbaren Schaltflächen.
+                    </p>
+
+                </article>
+
+
+                <article class="dokumentationskarte">
+
+                    <h3>Quellen, Hilfsmittel und Prüfung</h3>
+
+                    <p>
+                        Grundlage für den Seeds-Datensatz ist das
+                        Material der Lerneinheit DIM sowie das
+                        Seeds-Archiv des UCI Machine Learning
+                        Repository.
+                    </p>
+
+                    <p>
+                        Zum Einlesen der CSV-Datei verwende ich
+                        <a
+                            href="https://www.papaparse.com/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Papa Parse
+                        </a>.
+                        Die Verwendung orientiert sich an der
+                        Lerneinheit DAT.
+                    </p>
+
+                    <p>
+                        Für die Dimensionsreduktion verwende ich
+                        <a
+                            href="https://github.com/karpathy/tsnejs"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            tSNEJS von Andrej Karpathy
+                        </a>.
+                        Die schrittweise Berechnung orientiert sich
+                        an der Lerneinheit DIM.
+                    </p>
+
+                    <p>
+                        Für die Auswahl der gespeicherten Startdarstellung wurde
+                        ergänzend die t-SNE-Implementierung von
+                        <a
+                            href="https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                        scikit-learn
+                        </a>
+                        verwendet. Die interaktive Neuberechnung innerhalb der
+                        Webseite erfolgt mit tSNEJS.
+                    </p>
+
+                    <p>
+                        Die Webseite ist Schritt für Schritt in
+                        Visual Studio Code entstanden und wurde
+                        während der Umsetzung mehrfach an meine
+                        Gestaltungsidee angepasst. Bei einzelnen
+                        Fragen zur Seitenstruktur, zu JavaScript und
+                        bei der Fehlersuche habe ich ergänzend ein
+                        KI-gestütztes Sprachmodell genutzt.
+                        Verwendete Hinweise habe ich nachvollzogen,
+                        selbst angepasst und anschließend in der
+                        fertigen Anwendung getestet.
+                    </p>
+
+                    <p>
+                        Die Anwendung wurde in Google Chrome getestet.
+                        Zusätzlich wurde die Entwicklerkonsole auf
+                        Fehlermeldungen geprüft.
+                    </p>
+
+                </article>
+
+            </div>
+
+        </section>
+
+        <!-- END AUFGABE 10: Dokumentation -->
+
+
+        <!-- START AUFGABE 10: Entstehungsprozess -->
+
+        <section
+            class="entstehung"
+            aria-labelledby="entstehung-titel"
+        >
+
+            <p class="aufgabenbezeichnung">
+                Entstehungsprozess
+            </p>
+
+            <h2 id="entstehung-titel">
+                Schritt für Schritt zu den drei Weizeninseln
+            </h2>
+
+            <p class="abschnittseinleitung">
+                Die Screenshots zeigen die gespeicherte Startansicht,
+                den Neustart des Algorithmus und die anschließende
+                schrittweise Berechnung.
+            </p>
+
+            <div class="fortschrittsraster">
+
+                <figure class="fortschrittskarte">
+                    <img
+                        src="bilder/fortschritt/schritt_01.png"
+                        alt="Gespeichertes bestes t-SNE-Ergebnis mit drei farblich getrennten Weizenklassen"
+                    >
+                    <figcaption>
+                        <span>Schritt 1</span>
+                        <strong>Gespeichertes bestes Ergebnis</strong>
+                        <p>
+                            Direkt nach dem Laden zeigt die Anwendung
+                            die zuvor gespeicherten 3D-Koordinaten. Die
+                            drei Weizensorten sind bereits deutlich
+                            voneinander getrennt.
+                        </p>
+                    </figcaption>
+                </figure>
+
+                <figure class="fortschrittskarte">
+                    <img
+                        src="bilder/fortschritt/schritt_02.png"
+                        alt="Neu gestartete t-SNE-Berechnung bei Schritt null mit noch vermischten Klassen"
+                    >
+                    <figcaption>
+                        <span>Schritt 2</span>
+                        <strong>Neustart bei Schritt 0</strong>
+                        <p>
+                            Nach dem Neustart beginnt t-SNE mit einer
+                            neuen zufälligen Verteilung. Zu diesem
+                            Zeitpunkt liegen die drei Klassen noch
+                            weitgehend vermischt beieinander.
+                        </p>
+                    </figcaption>
+                </figure>
+
+                <figure class="fortschrittskarte">
+                    <img
+                        src="bilder/fortschritt/schritt_03.png"
+                        alt="t-SNE-Berechnung nach 200 Schritten mit zunehmend getrennten Weizenklassen"
+                    >
+                    <figcaption>
+                        <span>Schritt 3</span>
+                        <strong>Berechnung nach 200 Schritten</strong>
+                        <p>
+                            Durch die einzelnen Iterationen ordnet
+                            t-SNE ähnliche Proben zunehmend näher
+                            beieinander an. Die Klassen beginnen sich
+                            im dreidimensionalen Raum zu trennen.
+                        </p>
+                    </figcaption>
+                </figure>
+
+                <figure class="fortschrittskarte">
+                    <img
+                        src="bilder/fortschritt/schritt_04.png"
+                        alt="Fertige Anwendung mit geöffneter Entwicklerkonsole ohne Fehlermeldungen"
+                    >
+                    <figcaption>
+                        <span>Schritt 4</span>
+                        <strong>Abschließende Prüfung</strong>
+                        <p>
+                            Zum Schluss wurden die Bedienung, das
+                            Laden der CSV-Dateien und die Darstellung
+                            in Google Chrome getestet. In der
+                            Entwicklerkonsole sind keine roten
+                            Fehlermeldungen zu sehen.
+                        </p>
+                    </figcaption>
+                </figure>
+
+            </div>
+
+        </section>
+
+        <!-- END AUFGABE 10: Entstehungsprozess -->
+
+    </main>
+
+
+    <footer class="seitenfuss">
+
+        <p>
+            Einsendeaufgabe 10 · Seeds-Daten in 3D
+        </p>
+
+        <a href="#hauptinhalt">
+            Zurück nach oben
+        </a>
+
+    </footer>
+
+
+    <!--
+        Externe Bibliotheken:
+        Papa Parse liest die CSV-Datei ein.
+        tSNEJS reduziert die sieben Merkmale auf drei Dimensionen.
+    -->
+
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.6.1/papaparse.min.js">
+    </script>
+
+    <script
+        src="https://cdn.jsdelivr.net/gh/karpathy/tsnejs/tsne.js">
+    </script>
+
+    <!-- Der eigene Programmcode wird zuletzt geladen. -->
+    <script src="script.js"></script>
+
+</body>
+
+</html>
